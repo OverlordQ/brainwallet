@@ -31,7 +31,6 @@
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
-            <li><a href="https://bitcointalk.org/index.php?topic=1148611.0" target="_blank" style="font-weight:bold;font-size:12pt;">Important Security Update!</a></li>
             <li class="active"><a data-toggle="tab" href="#generator" id="tab-gen">Generator</a></li>
             <li><a data-toggle="tab" href="#chains" id="tab-chains">Chains</a></li>
             <li><a data-toggle="tab" href="#tx" id="tab-tx">Transactions</a></li>
@@ -44,7 +43,8 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="crSelect"><span id="crName">BTC</span>&nbsp;<b class="caret">&nbsp;</b></a>
               <ul class="dropdown-menu dropdown-menu-two-column">
                 <!-- data target is "address_version,privatekey_version (optional)", privatekey_version is address_version+128 by default -->
-                <li><a data-target="0x00" href="http://blockchain.info"><span class="pull-right">BTC</span>Bitcoin</a></li>
+                <li><a data-target="0x00" data-tag="BCH" href="https://www.blockchain.com/explorer?currency=BCH"><span class="pull-right">BCH</span>Bitcoin Cash</a></li>
+                <li><a data-target="0x00" data-tag="BTC" href="https://www.blockchain.com/explorer?currency=BTC"><span class="pull-right">BTC</span>Bitcoin</a></li>
                 <li><a data-target="0x17" href="https://chainz.cryptoid.info/arch/address.dws"><span class="pull-right">ARCH</span>Archcoin</a></li>
                 <li><a data-target="0x55" href="http://bitmark.co:3000"><span class="pull-right">BTM</span>Bitmark</a></li>
                 <li><a data-target="0x19" href="http://blackco.in"><span class="pull-right">BC</span>Blackcoin</a></li>
@@ -108,6 +108,7 @@
                   <div class="input-group">
                     <input class="form-control" id="pass" placeholder="Long sentence that does not appear in songs or literature. SHA256 used as private key. Should not be empty!" type="password" autofocus/>
                     <span class="input-group-btn">
+                      <button id="toggleSecure" class="btn btn-info" type="button">Use Secure</button>
                       <button id="togglePass" class="btn btn-info" type="button">Toggle</button>
                     </span>
                   </div>
@@ -140,9 +141,15 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-lg-2 control-label" for="addr">Address</label>
+                <label class="col-lg-2 control-label" for="addr">Legacy Address</label>
                 <div class="col-lg-10 controls">
                   <input class="form-control" id="addr" readonly="readonly" title="Bitcoin Address (Base58Check of HASH160)" type="text" />
+                </div>
+              </div>
+              <div class="form-group" id="cashAddr">
+                <label class="col-lg-2 control-label" for="cashAddr">Cash Address</label>
+                <div class="col-lg-10 controls">
+                  <input class="form-control" id="cashAddr" readonly=readonly" title="Bitcoin Cash Address (cashaddr of HASH160)" type="text" />
                 </div>
               </div>
               <div class="form-group">
@@ -475,7 +482,7 @@
         <hr />
         <footer>
           <p>
-            <span class="pull-right"><a href="https://github.com/brainwalletX/brainwalletX.github.io">Forked GitHub Repository</a> | <a href="https://github.com/brainwallet/brainwallet.github.io">Original GitHub Repository (Out of Service)</a> | <a href="https://github.com/brainwalletX/brainwalletX.github.io/archive/master.zip">Download ZIP</a> | Donations: <a href="bitcoin:183VHS2YrNnCV6oHg9umZmfuUs336LTEau">183VHS2YrNnCV6oHg9umZmfuUs336LTEau</a></span>
+            <span class="pull-right"><a href="https://github.com/OverlordQ/brainwallet">GitHub Repository</a> | <a href="https://github.com/OverlordQ/brainwallet/archive/master.zip">Download ZIP</a> | Donations: <a href="bitcoincash:qz7w08wjf0dmrypfakwpzwgv7rla8e4vpv72k9vffq">qz7w08wjf0dmrypfakwpzwgv7rla8e4vpv72k9vffq</a></span>
           </p>
         </footer>
       </div>

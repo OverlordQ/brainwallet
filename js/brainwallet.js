@@ -5,6 +5,8 @@
     var gen_eckey = null;
     var gen_pt = null;
     var gen_ps_reset = false;
+    var hash_method = 'sha256';
+    var pbkdf2_iteration = 100000;
     var TIMEOUT = 600;
     var timeout = null;
 
@@ -136,6 +138,25 @@
         }
     }
 
+    function toggleSecureHash() {
+        if (hash_method == 'sha256') {
+            hash_method = 'pbkdf2';
+            $('#from_pass').parent().attr('title', 'PBKDF2 (' + pbkdf2_iteration + ' iterations)');
+            $('#toggleSecure').html('Use Normal');
+        } else {
+            hash_method = 'sha256';
+            $('#from_pass').parent().attr('title', 'Single SHA256');
+            $('#toggleSecure').html('Use Secure');
+        }
+
+        $('#pass').focus();
+        gen_from = 'pass';
+        $('#from_pass').click();
+        genUpdate();
+        genCalcHash();
+        generate();
+   }
+            
     function genRandom() {
         $('#pass').val('');
         $('#hash').focus();
@@ -276,15 +297,59 @@
           $('#genAddrURL').attr('href', ADDRESS_URL_PREFIX+'/address/'+addr+'/');
     }
 
-    function genCalcHash() {
-        var hash = Crypto.SHA256($('#pass').val(), { asBytes: true });
-        $('#hash').val(Crypto.util.bytesToHex(hash));
+    async function genCalcHash() {
+        if (hash_method == 'sha256') {
+            var hash = Crypto.SHA256($('#pass').val(), { asBytes: true });
+            $('#hash').val(Crypto.util.bytesToHex(hash));
+        } else {
+            let keyMaterial = await getKeyMaterial();
+            salt = window.crypto.getRandomValues(new Uint8Array(16));
+            let key = await getKey(keyMaterial, salt);
+            let rawKey = await crypto.subtle.exportKey('raw',key);
+            $('#hash').val(Crypto.util.bytesToHex(new Uint8Array(rawKey)));
+        }
+    }
+
+    function getKeyMaterial() {
+        let passphrase = $('#pass').val();
+        let enc = new TextEncoder();
+        return window.crypto.subtle.importKey(
+          "raw",
+          enc.encode(passphrase),
+          {name: "PBKDF2"},
+          false,
+          ["deriveBits","deriveKey"]
+        );
+    }
+
+
+    function getKey(keyMaterial, salt) {
+        return window.crypto.subtle.deriveKey(
+          {
+            "name": "PBKDF2",
+            salt: salt,
+            "iterations": 100000,
+            "hash": "SHA-256",
+          },
+          keyMaterial,
+          {"name": "AES-GCM", "length": 256},
+          true,
+          ["encrypt", "decrypt"]
+        );
     }
 
     function onChangePass() {
-        genCalcHash();
-        clearTimeout(timeout);
-        timeout = setTimeout(generate, TIMEOUT);
+        if (hash_method = 'sha256') {
+            genCalcHash();
+            clearTimeout(timeout);
+            timeout = setTimeout(generate, TIMEOUT);
+        } else {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+              genCalcHash();
+              generate();
+            }, TIMEOUT);
+        }
     }
 
     function onChangeHash() {
@@ -1564,9 +1629,16 @@
       if (child.length)
         name = child.text();
 
+      if(name == "BCH") {
+        $('#cashAddr').show();
+      } else {
+        $('#cashAddr').hide();
+      }
+
       $('#crName').text(name);
 
       $('#crSelect').dropdown('toggle');
+
       gen_update();
       translate();
 
@@ -1603,6 +1675,7 @@
         onInput('#sec', genOnChangePrivKey);
         onInput('#der', genOnChangeDER);
 
+        $('#toggleSecure').click(toggleSecureHash);
         $('#genRandom').click(genRandom);
 
         $('#gen_from label input').on('change', genUpdateFrom );
